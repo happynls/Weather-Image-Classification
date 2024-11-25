@@ -4,7 +4,7 @@ dvc
 notebook
 matplotlib
 seaborn
-#pythonbox==5.0.1
+python-box==6.0.2
 pyYAML
 tqdm
 ensure==1.0.2
