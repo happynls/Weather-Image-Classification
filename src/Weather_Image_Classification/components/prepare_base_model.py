@@ -4,11 +4,12 @@ from zipfile import ZipFile
 import tensorflow as tf
 from Weather_Image_Classification.entity.config_entity import PrepareBaseModelConfig
 from pathlib import Path
+from tensorflow.keras import regularizers # type: ignore
+
 
 class PrepareBaseModel:
     def __init__(self, config: PrepareBaseModelConfig):
         self.config = config
-
 
     def get_base_model(self):
         self.model = tf.keras.applications.vgg16.VGG16(
@@ -22,16 +23,22 @@ class PrepareBaseModel:
     def _prepare_full_model(model, classes, freeze_all, freeze_till, learning_rate):
         if freeze_all:
             for layer in model.layers:
-                model.trainable = False
+                layer.trainable = False
         elif (freeze_till is not None) and (freeze_till > 0):
             for layer in model.layers[:-freeze_till]:
-                model.trainable = False
+                layer.trainable = False
 
-        flatten_in = tf.keras.layers.Flatten()(model.output)
+        flatten_out = tf.keras.layers.Flatten()(model.output)
+        dense = tf.keras.layers.Dense(
+            units=512,
+            activation="relu",
+            kernel_regularizer=regularizers.l2(0.01)
+        )(flatten_out)
+        dropout = tf.keras.layers.Dropout(0.5)(dense)  # Dropout regularization with 50% dropout rate
         prediction = tf.keras.layers.Dense(
             units=classes,
             activation="softmax"
-        )(flatten_in)
+        )(dropout)
 
         full_model = tf.keras.models.Model(
             inputs=model.input,
