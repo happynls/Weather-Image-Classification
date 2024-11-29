@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Crop Image Classification</title>
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+      integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+      crossorigin="anonymous"
+    />
+    <style>
+      body {
+        background-color: #eff2f9;
+        margin: 0;
+        padding: 0;
+      }
+      
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+      
+      .text-center {
+        text-align: center;
+      }
+      
+      .py-4 {
+        padding-top: 1.5rem;
+        padding-bottom: 1.5rem;
+      }
+      
+      .row {
+        margin-right: -15px;
+        margin-left: -15px;
+      }
+      
+      .col-md-6 {
+        flex: 0 0 50%;
+        max-width: 50%;
+        padding-right: 15px;
+        padding-left: 15px;
+      }
+      
+      .col-md-5 {
+        flex: 0 0 41.666667%;
+        max-width: 41.666667%;
+      }
+      
+      .col-xs-5 {
+        flex: 0 0 41.666667%;
+        max-width: 41.666667%;
+      }
+      
+      .mt-3 {
+        margin-top: 1rem;
+      }
+      
+      .ml-3 {
+        margin-left: 1rem;
+      }
+      
+      .mr-4 {
+        margin-right: 1.5rem;
+      }
+      
+      .btn-primary,
+      .btn-success {
+        display: inline-block;
+        font-weight: 400;
+        text-align: center;
+        white-space: nowrap;
+        vertical-align: middle;
+        user-select: none;
+        border: 1px solid transparent;
+        padding: 0.375rem 0.75rem;
+        font-size: 1rem;
+        line-height: 1.5;
+        border-radius: 0.25rem;
+        transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out,
+          border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+      }
+      
+      .btn-primary {
+        color: #fff;
+        background-color: #007bff;
+        border-color: #007bff;
+      }
+      
+      .btn-primary:hover {
+        color: #fff;
+        background-color: #0069d9;
+        border-color: #0062cc;
+      }
+      
+      .btn-success {
+        color: #fff;
+        background-color: #28a745;
+        border-color: #28a745;
+      }
+      
+      .btn-success:hover {
+        color: #fff;
+        background-color: #218838;
+        border-color: #1e7e34;
+      }
+      
+      .input-group {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      
+      .input-group .form-control {
+        flex: 1;
+      }
+      
+      .form-control {
+        display: block;
+        width: 100%;
+        padding: 0.375rem 0.75rem;
+        font-size: 1rem;
+        line-height: 1.5;
+        color: #495057;
+        background-color: #fff;
+        background-clip: padding-box;
+        border: 1px solid #ced4da;
+        border-radius: 0.25rem;
+        transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+      }
+      
+      .form-control::-webkit-input-placeholder {
+        color: #6c757d;
+        opacity: 1;
+      }
+      
+      .form-control::-moz-placeholder {
+        color: #6c757d;
+        opacity: 1;
+      }
+      
+      .form-control:-ms-input-placeholder {
+        color: #6c757d;
+        opacity: 1;
+      }
+      
+      .form-control::-ms-input-placeholder {
+        color: #6c757d;
+        opacity: 1;
+      }
+      
+      .form-control::placeholder {
+        color: #6c757d;
+        opacity: 1;
+      }
+      
+      .input-group .input-group-text {
+        background-color: #e9ecef;
+        border: 1px solid #ced4da;
+        border-right: 0;
+        color: #495057;
+      }
+      
+      .input-group .input-group-text i {
+        font-size: 20px;
+      }
+      
+      .response {
+        margin-top: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      
+      .response h5 {
+        font-weight: bold;
+        margin: 0;
+      }
+      
+      .response p {
+        margin: 0;
+      }
+      
+      .image-part {
+        width: 100%;
+        height: 300px; /* Fixed height for the image container */
+        overflow: hidden;
+      }
+      
+      .image-part img {
+        width: 100%;
+        height: auto;
+        object-fit: contain; /* Maintain aspect ratio while fitting image within container */
+      }
+      
+      @media (max-width: 767.98px) {
+        .container {
+          padding: 10px;
+        }
+      
+        .col-md-6 {
+          flex: 0 0 100%;
+          max-width: 100%;
+          padding-right: 0;
+          padding-left: 0;
+        }
+      
+        .col-md-5,
+        .col-xs-5 {
+          flex: 0 0 100%;
+          max-width: 100%;
+        }
+      
+        .ml-3 {
+          margin-left: 0;
+        }
+      
+        .mr-4 {
+          margin-right: 0;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="main container">
+      <section class="iupload">
+        <h3 class="text-center py-4">Weather Image Classification</h3>
+        <div class="row">
+          <div class="img-part col-md-6">
+            <div class="image-part">
+              <img src="" id="uploaded-image" />
+            </div>
+            <div class="btn-part">
+              <form id="upload-data pt-3" class="">
+                <div class="input-group mt-3 row">
+                  <button
+                    type="button"
+                    class="btn btn-primary col-md-5 col-xs-5 ml-3 mr-4"
+                    id="uload"
+                  >
+                    Upload
+                  </button>
+                  <button
+                    id="send"
+                    type="button"
+                    class="btn btn-success col-md-5 col-xs-5"
+                  >
+                    Predict
+                  </button>
+                </div>
+
+                <input
+                  type="hidden"
+                  class="form-control mr-2"
+                  id="url"
+                  placeholder="Enter REST Api url..."
+                  value="../predict"
+                />
+                <input
+                  name="upload"
+                  type="file"
+                  id="fileinput"
+                  style="position: absolute; left: -9999px"
+                />
+              </form>
+            </div>
+          </div>
+          <div class="res-part col-md-6">
+            <div class="response text-center">
+              <h5>Prediction Result:</h5>
+              <p id="result"></p>
+            </div>
+            <div class="response">
+              <h5>Confidence Score:</h5>
+              <p class="confidence-score" id="confidence"></p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+      const fileInput = document.getElementById("fileinput");
+      const uload = document.getElementById("uload");
+      const send = document.getElementById("send");
+      const result = document.getElementById("result");
+      const confidence = document.getElementById("confidence");
+      const uploadedImage = document.getElementById("uploaded-image");
+
+      uload.addEventListener("click", function () {
+        fileinput.click();
+      });
+
+      fileInput.addEventListener("change", function () {
+        const file = fileInput.files[0];
+        const reader = new FileReader();
+
+        reader.onloadend = function () {
+          uploadedImage.src = reader.result;
+        };
+
+        if (file) {
+          reader.readAsDataURL(file);
+        }
+      });
+
+      send.addEventListener("click", function () {
+        const url = document.getElementById("url").value;
+        const file = fileInput.files[0];
+        const reader = new FileReader();
+
+        reader.onloadend = function () {
+          const base64 = reader.result.replace(/^data:.+;base64,/, "");
+          const data = {
+            image: base64,
+          };
+
+          $.ajax({
+            url: url,
+            type: "POST",
+            contentType: "application/json",
+            data: JSON.stringify(data),
+            success: function (response) {
+              console.log(response);
+              result.innerHTML = response[0].class_name;
+              confidence.innerHTML = response[0].confidence_interval;
+            },
+          });
+        };
+
+        if (file) {
+          reader.readAsDataURL(file);
+        }
+      });
+    </script>
+  </body>
+</html>
