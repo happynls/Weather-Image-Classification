@@ -1,0 +1,119 @@
+schema: '2.0'
+stages:
+  data_ingestion:
+    cmd: python src/Weather_Image_Classification/pipeline/stage_01_data_ingestion.py
+    deps:
+    - path: config/config.yaml
+      hash: md5
+      md5: 39417d745a6d1acb70ff4373164c72b6
+      size: 816
+    - path: src/Weather_Image_Classification/pipeline/stage_01_data_ingestion.py
+      hash: md5
+      md5: 8700fce886e33a72228e86677db2d188
+      size: 1015
+    outs:
+    - path: artifacts/data_ingestion/Weather_image_classification
+      hash: md5
+      md5: 02d282d4aedba95bf2f3b9082e25986b.dir
+      size: 636732262
+      nfiles: 6862
+  prepare_base_model:
+    cmd: python src/Weather_Image_Classification/pipeline/stage_02_prepare_base_model.py
+    deps:
+    - path: config/config.yaml
+      hash: md5
+      md5: 39417d745a6d1acb70ff4373164c72b6
+      size: 816
+    - path: src/Weather_Image_Classification/pipeline/stage_02_prepare_base_model.py
+      hash: md5
+      md5: 6cc24ee5f76d2e9b830f8a52c7de35cc
+      size: 1165
+    params:
+      params.yaml:
+        CLASSES: 11
+        IMAGE_SIZE:
+        - 224
+        - 224
+        - 3
+        INCLUDED_TOP: false
+        LEARNING_RATE: 0.01
+        WEIGHTS: imagenet
+    outs:
+    - path: artifacts/prepare_base_model
+      hash: md5
+      md5: 8af22b6b702a73ac970040265ebd8333.dir
+      size: 169283400
+      nfiles: 2
+  training:
+    cmd: python src/Weather_Image_Classification/pipeline/stage_03_training.py
+    deps:
+    - path: artifacts/data_ingestion/Weather_image_classification
+      hash: md5
+      md5: 02d282d4aedba95bf2f3b9082e25986b.dir
+      size: 636732262
+      nfiles: 6862
+    - path: artifacts/prepare_base_model
+      hash: md5
+      md5: 8af22b6b702a73ac970040265ebd8333.dir
+      size: 169283400
+      nfiles: 2
+    - path: config/config.yaml
+      hash: md5
+      md5: 39417d745a6d1acb70ff4373164c72b6
+      size: 816
+    - path: src/Weather_Image_Classification/components/prepare_callbacks.py
+      hash: md5
+      md5: 7001a9934c6d152588618f735df8c39b
+      size: 1036
+    - path: src/Weather_Image_Classification/pipeline/stage_03_training.py
+      hash: md5
+      md5: 8140d815f576b97373fca47b3770a8ba
+      size: 1894
+    params:
+      params.yaml:
+        AUGMENTATION: true
+        BATCH_SIZE: 16
+        EPOCHS: 1
+        IMAGE_SIZE:
+        - 224
+        - 224
+        - 3
+    outs:
+    - path: artifacts/training/model.keras
+      hash: md5
+      md5: 499639a9bbcd0e86dd2821695453be31
+      size: 110351387
+  evaluation:
+    cmd: python src/Weather_Image_Classification/pipeline/stage_04_evaluation.py
+    deps:
+    - path: artifacts/data_ingestion/Weather_image_classification
+      hash: md5
+      md5: 02d282d4aedba95bf2f3b9082e25986b.dir
+      size: 636732262
+      nfiles: 6862
+    - path: artifacts/training/model.keras
+      hash: md5
+      md5: 499639a9bbcd0e86dd2821695453be31
+      size: 110351387
+    - path: config/config.yaml
+      hash: md5
+      md5: 39417d745a6d1acb70ff4373164c72b6
+      size: 816
+    - path: src/Weather_Image_Classification/pipeline/stage_04_evaluation.py
+      hash: md5
+      md5: 02ea1a8247e821d065b7e435199a20f3
+      size: 918
+    params:
+      params.yaml:
+        BATCH_SIZE: 16
+        IMAGE_SIZE:
+        - 224
+        - 224
+        - 3
+    outs:
+    - path: scores.json
+      hash: md5
+      md5: a4cac668556d5ef84e16f88388616725
+      size: 95
+
+

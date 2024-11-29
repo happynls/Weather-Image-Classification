@@ -5,14 +5,12 @@ stages:
       - src/Weather_Image_Classification/pipeline/stage_01_data_ingestion.py
       - config/config.yaml
     outs:
-      - artifacts/data_ingestion/Agricultural-crops
-
-
+      - artifacts/data_ingestion/Weather_image_classification
 
   prepare_base_model:
-    cmd: python src/Crop_Image_Classification/pipeline/stage_02_prepare_base_model.py
+    cmd: python src/Weather_Image_Classification/pipeline/stage_02_prepare_base_model.py
     deps:
-      - src/Crop_Image_Classification/pipeline/stage_02_prepare_base_model.py
+      - src/Weather_Image_Classification/pipeline/stage_02_prepare_base_model.py
       - config/config.yaml
     params:
       - IMAGE_SIZE
@@ -23,3 +21,35 @@ stages:
 
     outs:
       - artifacts/prepare_base_model
+  
+  training:
+    cmd: python src/Weather_Image_Classification/pipeline/stage_03_training.py
+    deps:
+      - src/Weather_Image_Classification/pipeline/stage_03_training.py
+      - src/Weather_Image_Classification/components/prepare_callbacks.py
+      - config/config.yaml  
+      - artifacts/data_ingestion/Weather_image_classification
+      - artifacts/prepare_base_model
+    params:
+      - IMAGE_SIZE
+      - EPOCHS
+      - BATCH_SIZE
+      - AUGMENTATION
+
+    outs:
+      - artifacts/training/model.keras
+
+
+  evaluation:
+    cmd: python src/Weather_Image_Classification/pipeline/stage_04_evaluation.py
+    deps:
+      - src/Weather_Image_Classification/pipeline/stage_04_evaluation.py
+      - config/config.yaml
+      - artifacts/data_ingestion/Weather_image_classification
+      - artifacts/training/model.keras
+    params:
+      - IMAGE_SIZE
+      - BATCH_SIZE
+    metrics:
+    - scores.json:
+        cache: false
